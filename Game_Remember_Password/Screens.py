@@ -75,6 +75,9 @@ class GameScreen(MyScreen):
         ]
 
     def _backCallback(self) -> None:
+        self._display.config(state="normal")
+        self._display.delete("1.0", tk.END)
+        self._display.config(state="disabled")
         self.controller.showScreen(Screens.INITIAL)
 
     def _checkCallback(self) -> None:
@@ -107,6 +110,7 @@ class GameScreen(MyScreen):
         self._display.config(state="normal")
         self._display.delete("1.0", tk.END)
         self._display.insert("1.0", text)
+        self._entry.delete(0, tk.END)
         for i, (color, f) in enumerate(formatting):
             tag_name: str = f"char_{i}"
             start_idx: str = f"1.{i}"
