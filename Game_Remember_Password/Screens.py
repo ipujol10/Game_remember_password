@@ -2,18 +2,24 @@
 
 import tkinter as tk
 from typing import TYPE_CHECKING
+from abc import ABC, abstractmethod
+from Utils import Screens
 
 
 if TYPE_CHECKING:
     from Game import Game
 
 
-class MyScreen(tk.Frame):
+class MyScreen(tk.Frame, ABC):
     """Screen base for the rest of screens"""
 
     def __init__(self, parent: tk.Frame, controller: "Game") -> None:
         tk.Frame.__init__(self, master=parent)
         self.controller: "Game" = controller
+
+    @abstractmethod
+    def setScreen(self) -> None:
+        """Set the screen settings"""
 
 
 class InitialScreen(MyScreen):
@@ -21,6 +27,20 @@ class InitialScreen(MyScreen):
 
     def __init__(self, parent: tk.Frame, controller: "Game") -> None:
         MyScreen.__init__(self, parent, controller)
+        self._password: str = ""
+
+        tk.Label(self, text="Enter the password to train").grid(column=0, row=0, sticky="nwe")
+        self._password_entry: tk.Entry = tk.Entry(self, width=40, show="*")
+        self._password_entry.grid(column=0, row=1)
+        tk.Button(self, text="Train", command=self._trainCallback).grid(column=0, row=2)
+
+    def _trainCallback(self) -> None:
+        self._password = self._password_entry.get()
+        self.controller.showScreen(Screens.GAME)
+
+    def setScreen(self) -> None:
+        self._password_entry.delete(0, tk.END)
+        self._password_entry.insert(0, self._password)
 
 
 class GameScreen(MyScreen):
@@ -28,3 +48,11 @@ class GameScreen(MyScreen):
 
     def __init__(self, parent: tk.Frame, controller: "Game") -> None:
         MyScreen.__init__(self, parent, controller)
+
+        tk.Button(self, text="Start again", command=self._backCallback).grid(column=0, row=0)
+
+    def _backCallback(self) -> None:
+        self.controller.showScreen(Screens.INITIAL)
+
+    def setScreen(self) -> None:
+        pass

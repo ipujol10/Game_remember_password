@@ -27,6 +27,7 @@ class Game(tk.Tk):
     def showScreen(self, screen: Screens) -> None:
         """Display the selected screen"""
         self._current_frame = self._frames[screen]
+        self._current_frame.setScreen()
         self._current_frame.tkraise()  # type: ignore
 
     def __enter__(self) -> "Game":
