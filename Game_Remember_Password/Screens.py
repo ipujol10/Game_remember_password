@@ -1,6 +1,7 @@
 """The Screens to be used in the Game"""
 
 import tkinter as tk
+from tkinter import font
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from Utils import Screens
@@ -41,6 +42,7 @@ class InitialScreen(MyScreen):
 
     def _trainCallback(self) -> None:
         self._password = self._password_entry.get()
+        self.controller.password = self._password
         self.controller.showScreen(Screens.GAME)
 
     def setScreen(self) -> None:
@@ -53,6 +55,7 @@ class GameScreen(MyScreen):
 
     def __init__(self, parent: tk.Frame, controller: "Game") -> None:
         MyScreen.__init__(self, parent, controller)
+        self._correct_password: str
 
         self._entry: tk.Entry = tk.Entry(self, width=40)
         self._entry.grid(column=0, row=0, pady=20)
@@ -67,12 +70,51 @@ class GameScreen(MyScreen):
         self.grid_rowconfigure(2, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
+        self._fonts: list[font.Font] = [
+            font.Font(family="Arial", size=12),
+            font.Font(family="Arial", size=12, underline=True),
+        ]
+
     def _backCallback(self) -> None:
         self.controller.showScreen(Screens.INITIAL)
 
     def _checkCallback(self) -> None:
-        raise NotImplementedError
+        current_password: str = self._entry.get()
+        length: int = max(len(current_password), len(self._correct_password))
+        self._display.config(state="normal")
+        self._display.delete("1.0", tk.END)
+        for i in range(length):
+            tag_name: str = f"char_{i}"
+            start_idx: str = f"1.{i}"
+            end_idx: str = f"1.{i+1}"
+            self._display.tag_add(tag_name, start_idx, end_idx)
+            foreground: str
+            f: font.Font
+            char: str
+            if i >= len(self._correct_password):
+                foreground = "yellow"
+                f = self._fonts[1]
+                char = "x"
+            elif i >= len(current_password):
+                foreground = "yellow"
+                f = self._fonts[1]
+                char = "?"
+            else:
+                f = self._fonts[0]
+                char = current_password[i]
+                if self._correct_password[i] == current_password[i]:
+                    foreground = "green"
+                else:
+                    foreground = "red"
+            self._display.insert(start_idx, char)
+            self._display.tag_config(
+                tagName=tag_name,
+                foreground=foreground,
+                font=f,
+            )
+        self._display.config(state="disabled")
 
     def setScreen(self) -> None:
         self._entry.delete(0, tk.END)
         self._display.delete("1.0", tk.END)
+        self._correct_password = self.controller.password

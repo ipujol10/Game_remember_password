@@ -14,7 +14,7 @@ class Game(tk.Tk):
         self.title("Password Game")
         self.main_frame: tk.Frame = tk.Frame(self)
         self.main_frame.grid(column=0, row=0, sticky="nswe")
-        self._current_frame: tk.Frame
+        self._current_frame: MyScreen
         self._frames: dict[Screens, MyScreen] = {}
         for i, screen in enumerate((InitialScreen, GameScreen)):
             frame = screen(parent=self.main_frame, controller=self)
@@ -23,6 +23,8 @@ class Game(tk.Tk):
             frame.grid(row=0, column=0, sticky="nswe")
 
         self.showScreen(Screens.INITIAL)
+
+        self.password: str
 
     def showScreen(self, screen: Screens) -> None:
         """Display the selected screen"""
