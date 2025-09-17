@@ -62,7 +62,7 @@ class GameScreen(MyScreen):
         tk.Button(self, text="Check", command=self._checkCallback).grid(column=0, row=1, pady=20)
         self._display: tk.Text = tk.Text(self, width=40, height=1, state="disabled")
         self._display.grid(column=0, row=2, pady=20)
-        tk.Button(self, text="Start again", command=self._backCallback).grid(column=0, row=3, pady=20)
+        tk.Button(self, text="Start again", command=self._backCallback).grid(column=0, row=3, pady=20, ipady=5)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -81,35 +81,40 @@ class GameScreen(MyScreen):
     def _checkCallback(self) -> None:
         current_password: str = self._entry.get()
         length: int = max(len(current_password), len(self._correct_password))
-        self._display.config(state="normal")
-        self._display.delete("1.0", tk.END)
+        text: str = ""
+        formatting: list[tuple[str, font.Font]] = []
         for i in range(length):
-            tag_name: str = f"char_{i}"
-            start_idx: str = f"1.{i}"
-            end_idx: str = f"1.{i+1}"
-            self._display.tag_add(tag_name, start_idx, end_idx)
-            foreground: str
+            color: str
             f: font.Font
             char: str
             if i >= len(self._correct_password):
-                foreground = "yellow"
+                color = "yellow"
                 f = self._fonts[1]
                 char = "x"
             elif i >= len(current_password):
-                foreground = "yellow"
+                color = "yellow"
                 f = self._fonts[1]
                 char = "?"
             else:
                 f = self._fonts[0]
                 char = current_password[i]
                 if self._correct_password[i] == current_password[i]:
-                    foreground = "green"
+                    color = "green"
                 else:
-                    foreground = "red"
-            self._display.insert(start_idx, char)
+                    color = "red"
+            text += char
+            formatting.append((color, f))
+        self._display.config(state="normal")
+        self._display.delete("1.0", tk.END)
+        self._display.insert("1.0", text)
+        for i, (color, f) in enumerate(formatting):
+            tag_name: str = f"char_{i}"
+            start_idx: str = f"1.{i}"
+            end_idx: str = f"1.{i+1}"
+            self._display.tag_add(tag_name, start_idx, end_idx)
             self._display.tag_config(
                 tagName=tag_name,
-                foreground=foreground,
+                foreground=color,
                 font=f,
             )
         self._display.config(state="disabled")
