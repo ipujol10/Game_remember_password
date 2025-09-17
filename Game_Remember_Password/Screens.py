@@ -1,7 +1,6 @@
 """The Screens to be used in the Game"""
 
 import tkinter as tk
-from tkinter import font
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from Utils import Screens
@@ -70,9 +69,9 @@ class GameScreen(MyScreen):
         self.grid_rowconfigure(2, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        self._fonts: list[font.Font] = [
-            font.Font(family="Arial", size=12),
-            font.Font(family="Arial", size=12, underline=True),
+        self._fonts: list[tuple[str, int, str]] = [
+            ("Arial", 12, ""),
+            ("Arial", 12, "underline"),
         ]
 
     def _backCallback(self) -> None:
@@ -82,17 +81,18 @@ class GameScreen(MyScreen):
         current_password: str = self._entry.get()
         length: int = max(len(current_password), len(self._correct_password))
         text: str = ""
-        formatting: list[tuple[str, font.Font]] = []
+        formatting: list[tuple[str, tuple[str, int, str]]] = []
+        yellow: str = "#f0a71f"
         for i in range(length):
             color: str
-            f: font.Font
+            f: tuple[str, int, str]
             char: str
             if i >= len(self._correct_password):
-                color = "yellow"
+                color = yellow
                 f = self._fonts[1]
                 char = "x"
             elif i >= len(current_password):
-                color = "yellow"
+                color = yellow
                 f = self._fonts[1]
                 char = "?"
             else:
