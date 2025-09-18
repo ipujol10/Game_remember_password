@@ -75,13 +75,12 @@ class GameScreen(MyScreen):
         ]
 
     def _backCallback(self) -> None:
-        self._display.config(state="normal")
-        self._display.delete("1.0", tk.END)
-        self._display.config(state="disabled")
         self.controller.showScreen(Screens.INITIAL)
 
     def _checkCallback(self) -> None:
         current_password: str = self._entry.get()
+        if current_password == self._correct_password:
+            self.controller.showScreen(Screens.INITIAL)
         length: int = max(len(current_password), len(self._correct_password))
         text: str = ""
         formatting: list[tuple[str, tuple[str, int, str]]] = []
@@ -125,5 +124,7 @@ class GameScreen(MyScreen):
 
     def setScreen(self) -> None:
         self._entry.delete(0, tk.END)
+        self._display.config(state="normal")
         self._display.delete("1.0", tk.END)
+        self._display.config(state="disabled")
         self._correct_password = self.controller.password
