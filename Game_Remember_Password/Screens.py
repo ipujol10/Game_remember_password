@@ -1,6 +1,7 @@
 """The Screens to be used in the Game"""
 
 import tkinter as tk
+from tkinter import Event
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from Utils import Screens
@@ -20,6 +21,15 @@ class MyScreen(tk.Frame, ABC):
     @abstractmethod
     def setScreen(self) -> None:
         """Set the screen settings"""
+
+    def keyboardBinding(self) -> None:
+        """Bind the current screen keys"""
+        self.unbind_all("<Key>")
+        self.bind_all("<Key>", self._key)
+
+    @abstractmethod
+    def _key(self, event: Event) -> None:
+        """Set the key bindings"""
 
 
 class InitialScreen(MyScreen):
@@ -47,6 +57,18 @@ class InitialScreen(MyScreen):
     def setScreen(self) -> None:
         self._password_entry.delete(0, tk.END)
         self._password_entry.insert(0, self._password)
+
+    def _key(self, event: Event) -> None:
+        key: str = event.keysym
+        match key:
+            case "Return":
+                self._trainCallback()
+                return
+            case "Escape":
+                self.quit()
+                return
+            case _:
+                pass
 
 
 class GameScreen(MyScreen):
@@ -128,3 +150,15 @@ class GameScreen(MyScreen):
         self._display.delete("1.0", tk.END)
         self._display.config(state="disabled")
         self._correct_password = self.controller.password
+
+    def _key(self, event: Event) -> None:
+        key: str = event.keysym
+        match key:
+            case "Return":
+                self._checkCallback()
+                return
+            case "Escape":
+                self._backCallback()
+                return
+            case _:
+                pass
