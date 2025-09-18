@@ -57,6 +57,7 @@ class InitialScreen(MyScreen):
     def setScreen(self) -> None:
         self._password_entry.delete(0, tk.END)
         self._password_entry.insert(0, self._password)
+        self._password_entry.focus_set()
 
     def _key(self, event: Event) -> None:
         key: str = event.keysym
@@ -150,6 +151,7 @@ class GameScreen(MyScreen):
         self._display.delete("1.0", tk.END)
         self._display.config(state="disabled")
         self._correct_password = self.controller.password
+        self._entry.focus_set()
 
     def _key(self, event: Event) -> None:
         key: str = event.keysym
