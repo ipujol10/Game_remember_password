@@ -2,8 +2,8 @@
 
 import tkinter as tk
 from types import TracebackType
-from Utils import Screens
-from Screens import MyScreen, InitialScreen, GameScreen
+from Game_Remember_Password.Utils import Screens
+from Game_Remember_Password.Screens import MyScreen, InitialScreen, GameScreen
 
 
 class Game(tk.Tk):

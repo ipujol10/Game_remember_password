@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import Event
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
-from Utils import Screens
+from Game_Remember_Password.Utils import Screens
 
 
 if TYPE_CHECKING:

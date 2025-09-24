@@ -1,6 +1,6 @@
 """Main game loop"""
 
-from Game import Game
+from Game_Remember_Password.Game import Game
 
 
 def main() -> None:
