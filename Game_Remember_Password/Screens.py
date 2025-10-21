@@ -5,6 +5,7 @@ from tkinter import Event
 from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 from Game_Remember_Password.Utils import Screens
+from Game_Remember_Password.Widgets import Entry
 
 
 if TYPE_CHECKING:
@@ -209,12 +210,12 @@ class AllPasswords(MyScreen):
             case "Escape":
                 self.controller.showScreen(Screens.INITIAL)
             case "Return":
-                self._addEntry()
+                self._addEntry("Name", "Password")
             case _:
                 pass
 
     def _onMousewheel(self, event: Event) -> None:
         self._canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    def _addEntry(self) -> None:
-        tk.Label(self._inner_frame, text="Test_i").pack(pady=5)
+    def _addEntry(self, name: str, password: str) -> None:
+        Entry(self._inner_frame, name, password).pack(pady=5)
