@@ -8,3 +8,4 @@ class Screens(Enum):
 
     INITIAL = 0
     GAME = 1
+    ALL_PASSWORDS = 2

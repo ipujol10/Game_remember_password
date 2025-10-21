@@ -3,7 +3,7 @@
 import tkinter as tk
 from types import TracebackType
 from Game_Remember_Password.Utils import Screens
-from Game_Remember_Password.Screens import MyScreen, InitialScreen, GameScreen
+from Game_Remember_Password.Screens import MyScreen, InitialScreen, GameScreen, AllPasswords
 
 
 class Game(tk.Tk):
@@ -16,7 +16,7 @@ class Game(tk.Tk):
         self.main_frame.grid(column=0, row=0, sticky="nswe")
         self._current_frame: MyScreen
         self._frames: dict[Screens, MyScreen] = {}
-        for i, screen in enumerate((InitialScreen, GameScreen)):
+        for i, screen in enumerate((InitialScreen, GameScreen, AllPasswords)):
             frame = screen(parent=self.main_frame, controller=self)
             self._frames[Screens(i)] = frame
 

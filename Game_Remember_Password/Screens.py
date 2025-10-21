@@ -43,16 +43,23 @@ class InitialScreen(MyScreen):
         self._password_entry: tk.Entry = tk.Entry(self, width=40, show="*")
         self._password_entry.grid(column=0, row=1, pady=20)
         tk.Button(self, text="Train", command=self._trainCallback).grid(column=0, row=2, pady=20)
+        tk.Button(self, text="Saved", command=self._toTrain).grid(column=0, row=3, pady=20)
+        tk.Button(self, text="Exit", command=self.quit).grid(column=0, row=4, pady=20)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(4, weight=1)
 
     def _trainCallback(self) -> None:
         self._password = self._password_entry.get()
         self.controller.password = self._password
         self.controller.showScreen(Screens.GAME)
+
+    def _toTrain(self) -> None:
+        self.controller.showScreen(Screens.ALL_PASSWORDS)
 
     def setScreen(self) -> None:
         self._password_entry.delete(0, tk.END)
@@ -162,5 +169,43 @@ class GameScreen(MyScreen):
             case "Escape":
                 self._backCallback()
                 return
+            case _:
+                pass
+
+
+class AllPasswords(MyScreen):
+    """Screen to have saved passwords and be able to train on them"""
+
+    def __init__(self, parent: tk.Frame, controller: "Game") -> None:
+        MyScreen.__init__(self, parent, controller)
+
+        self._canvas: tk.Canvas = tk.Canvas(self)
+        self._scrollbar: tk.Scrollbar = tk.Scrollbar(
+            self,
+            orient="vertical",
+            command=self._canvas.yview,  # type:ignore
+        )
+
+        self.inner_frame: tk.Frame = tk.Frame(self._canvas)
+
+        self.inner_frame.bind(
+            "<Configure>",
+            lambda _: self._canvas.configure(scrollregion=self._canvas.bbox("all")),
+        )
+
+        self._canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
+        self._canvas.configure(yscrollcommand=self._scrollbar.set)
+
+        self._canvas.pack(side="left", fill="both", expand=True)
+        self._scrollbar.pack(side="right", fill="y")
+
+    def setScreen(self) -> None:
+        pass
+
+    def _key(self, event: Event) -> None:
+        key: str = event.keysym
+        match key:
+            case "Escape":
+                self.controller.showScreen(Screens.INITIAL)
             case _:
                 pass
