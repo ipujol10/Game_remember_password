@@ -186,14 +186,15 @@ class AllPasswords(MyScreen):
             command=self._canvas.yview,  # type:ignore
         )
 
-        self.inner_frame: tk.Frame = tk.Frame(self._canvas)
+        self._inner_frame: tk.Frame = tk.Frame(self._canvas)
 
-        self.inner_frame.bind(
+        self._inner_frame.bind(
             "<Configure>",
             lambda _: self._canvas.configure(scrollregion=self._canvas.bbox("all")),
         )
+        self._canvas.bind("<MouseWheel>", self._onMousewheel)
 
-        self._canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
+        self._canvas.create_window((0, 0), window=self._inner_frame, anchor="nw")
         self._canvas.configure(yscrollcommand=self._scrollbar.set)
 
         self._canvas.pack(side="left", fill="both", expand=True)
@@ -207,5 +208,13 @@ class AllPasswords(MyScreen):
         match key:
             case "Escape":
                 self.controller.showScreen(Screens.INITIAL)
+            case "Return":
+                self._addEntry()
             case _:
                 pass
+
+    def _onMousewheel(self, event: Event) -> None:
+        self._canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def _addEntry(self) -> None:
+        tk.Label(self._inner_frame, text="Test_i").pack(pady=5)
