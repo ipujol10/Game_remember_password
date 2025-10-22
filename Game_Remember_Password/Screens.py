@@ -187,7 +187,7 @@ class AllPasswords(MyScreen):
             command=self._canvas.yview,  # type:ignore
         )
 
-        self._inner_frame: tk.Frame = tk.Frame(self._canvas)
+        self._inner_frame: tk.Frame = tk.Frame(self._canvas, width=controller.winfo_width())
 
         self._inner_frame.bind(
             "<Configure>",
@@ -218,4 +218,4 @@ class AllPasswords(MyScreen):
         self._canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _addEntry(self, name: str, password: str) -> None:
-        Entry(self._inner_frame, name, password).pack(pady=5)
+        Entry(self._inner_frame, name, password).pack(pady=5, expand=True)
