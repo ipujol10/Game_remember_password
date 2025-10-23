@@ -200,6 +200,7 @@ class AllPasswords(MyScreen):
 
         self._canvas.pack(side="left", fill="both", expand=True)
         self._scrollbar.pack(side="right", fill="y")
+        self._inner_frame.pack(fill="both")
 
     def setScreen(self) -> None:
         pass
@@ -218,4 +219,4 @@ class AllPasswords(MyScreen):
         self._canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _addEntry(self, name: str, password: str) -> None:
-        Entry(self._inner_frame, name, password).pack(pady=5, expand=True)
+        Entry(self._inner_frame, name, password).pack(pady=1, expand=True)
