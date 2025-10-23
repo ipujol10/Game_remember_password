@@ -40,19 +40,12 @@ class InitialScreen(MyScreen):
         MyScreen.__init__(self, parent, controller)
         self._password: str = ""
 
-        tk.Label(self, text="Enter the password to train").grid(column=0, row=0, pady=20, sticky="nwe")
+        tk.Label(self, text="Enter the password to train").pack(pady=20)
         self._password_entry: tk.Entry = tk.Entry(self, width=40, show="*")
-        self._password_entry.grid(column=0, row=1, pady=20)
-        tk.Button(self, text="Train", command=self._trainCallback).grid(column=0, row=2, pady=20)
-        tk.Button(self, text="Saved", command=self._toTrain).grid(column=0, row=3, pady=20)
-        tk.Button(self, text="Exit", command=self.quit).grid(column=0, row=4, pady=20)
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_rowconfigure(3, weight=1)
-        self.grid_rowconfigure(4, weight=1)
+        self._password_entry.pack(pady=20)
+        tk.Button(self, text="Train", command=self._trainCallback).pack(pady=20)
+        tk.Button(self, text="Saved", command=self._toTrain).pack(pady=0)
+        tk.Button(self, text="Exit", command=self.quit).pack(pady=20)
 
     def _trainCallback(self) -> None:
         self._password = self._password_entry.get()
@@ -198,7 +191,7 @@ class AllPasswords(MyScreen):
         self._canvas.create_window((0, 0), window=self._inner_frame, anchor="nw")
         self._canvas.configure(yscrollcommand=self._scrollbar.set)
 
-        self._canvas.pack(side="left", fill="both", expand=True)
+        self._canvas.pack(side="left", fill="both")
         self._scrollbar.pack(side="right", fill="y")
         self._inner_frame.pack(fill="both")
 
@@ -219,4 +212,4 @@ class AllPasswords(MyScreen):
         self._canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _addEntry(self, name: str, password: str) -> None:
-        Entry(self._inner_frame, name, password).pack(pady=1, expand=True)
+        Entry(self._inner_frame, self.controller, name, password).pack(pady=1)

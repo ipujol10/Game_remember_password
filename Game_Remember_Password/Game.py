@@ -12,8 +12,9 @@ class Game(tk.Tk):
     def __init__(self) -> None:
         tk.Tk.__init__(self)
         self.title("Password Game")
+        self.geometry("400x320")
         self.main_frame: tk.Frame = tk.Frame(self)
-        self.main_frame.grid(column=0, row=0, sticky="nswe")
+        self.main_frame.pack(fill="both", expand=True)
         self._current_frame: MyScreen
         self._frames: dict[Screens, MyScreen] = {}
         for i, screen in enumerate((InitialScreen, GameScreen, AllPasswords)):
@@ -21,10 +22,13 @@ class Game(tk.Tk):
             self._frames[Screens(i)] = frame
 
             frame.grid(row=0, column=0, sticky="nswe")
+            # frame.pack(anchor="nw", expand=True, fill="both")
 
         self.showScreen(Screens.INITIAL)
 
         self.password: str
+
+        # '399x318+182+182'
 
     def showScreen(self, screen: Screens) -> None:
         """Display the selected screen"""
