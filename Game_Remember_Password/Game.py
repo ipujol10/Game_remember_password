@@ -22,13 +22,10 @@ class Game(tk.Tk):
             self._frames[Screens(i)] = frame
 
             frame.grid(row=0, column=0, sticky="nswe")
-            # frame.pack(anchor="nw", expand=True, fill="both")
 
         self.showScreen(Screens.INITIAL)
 
         self.password: str
-
-        # '399x318+182+182'
 
     def showScreen(self, screen: Screens) -> None:
         """Display the selected screen"""
