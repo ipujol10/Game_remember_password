@@ -205,8 +205,6 @@ class AllPasswords(MyScreen):
         match key:
             case "Escape":
                 self.controller.showScreen(Screens.INITIAL)
-            # case "Return":
-            #     self.addEntry("Name", "Password")
             case _:
                 pass
 
@@ -248,13 +246,15 @@ class AddEntry(tk.Toplevel):
         self.grid_rowconfigure(2, weight=1)
 
         self.protocol("WM_DELETE_WINDOW", self._onClose)
+        self.bind("<KeyPress>", self._key)
+        self._name.focus()
 
     @staticmethod
     def getInstance(master: "Game", parent_screen: AllPasswords) -> "AddEntry":
         """Get the AddEntry instance if it exists or create it if not"""
         if AddEntry._instance is None:
             AddEntry._instance = AddEntry(master, parent_screen)
-        AddEntry._instance.focus()
+        AddEntry._instance.focusEntry()
         return AddEntry._instance
 
     def _sendEntry(self) -> None:
@@ -265,4 +265,18 @@ class AddEntry(tk.Toplevel):
 
     def _onClose(self) -> None:
         AddEntry._instance = None
+        self.unbind("<KeyPress>")
         self.destroy()
+
+    def _key(self, event: Event) -> None:
+        key: str = event.keysym
+        match key:
+            case "Return":
+                if self._name.get() and self._password.get():
+                    self._sendEntry()
+            case _:
+                pass
+
+    def focusEntry(self) -> None:
+        """Focus on the name entry Entry"""
+        self._name.focus()
