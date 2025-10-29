@@ -193,6 +193,8 @@ class AllPasswords(MyScreen):
 
         tk.Button(self, text="Add", command=self._popout).pack(side="top", fill="y")
 
+        self._entries: set[Entry] = set()
+
         self._canvas.pack(side="left", fill="both", expand=True)
         self._scrollbar.pack(side="right", fill="y")
         self._inner_frame.pack(fill="both")
@@ -213,10 +215,14 @@ class AllPasswords(MyScreen):
 
     def addEntry(self, name: str, password: str) -> None:
         """Add a password entry"""
-        Entry(self._inner_frame, self.controller, name, password).pack(pady=1)
+        Entry(self._inner_frame, self.controller, self, name, password).pack(pady=1)
 
     def _popout(self) -> Any:
         AddEntry.getInstance(self.controller, self)
+
+    def deleteEntry(self, entry: Entry) -> None:
+        """Delete the selected item"""
+        entry.destroy()
 
 
 class AddEntry(tk.Toplevel):
