@@ -10,14 +10,14 @@ class DataBase:
     """Class to manage the DataBase"""
 
     def __init__(self, file: str) -> None:
-        new: bool = False
         if not os.path.exists(file):
-            new = True
             open(file, "a", encoding="utf_8").close()
         self.con = sqlite3.connect(file)
-        if new:
-            cur: sqlite3.Cursor = self.con.cursor()
+        cur: sqlite3.Cursor = self.con.cursor()
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        if ("entries",) not in cur.fetchall():
             cur.execute("CREATE TABLE entries(name TEXT PRIMARY KEY, password TEXT)")
+            print("Table created")
 
     def __enter__(self) -> "DataBase":
         return self

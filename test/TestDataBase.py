@@ -32,3 +32,10 @@ class DataBaseTest(unittest.TestCase):
 
         os.remove(file)
         open(file, "w", encoding="utf_8").close()
+
+    def testGetEntries(self) -> None:
+        """Thest DB get entries"""
+        file: str = "test/data/get.db"
+        with DataBase(file) as db:
+            entries: list[tuple[str, str]] = db.getEntries()
+            self.assertEqual(entries, [("test", "password"), ("test2", "password2")])
