@@ -23,3 +23,12 @@ class DataBaseTest(unittest.TestCase):
 
         os.remove(file)
         self.assertFalse(os.path.exists(file))
+
+    def testCreateNewDB(self) -> None:
+        """Test the creation of a database"""
+        file: str = "test/data/createDB.db"
+        with DataBase(file) as db:
+            self.assertFalse(db.getEntries())
+
+        os.remove(file)
+        open(file, "w", encoding="utf_8").close()

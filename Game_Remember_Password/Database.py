@@ -10,9 +10,14 @@ class DataBase:
     """Class to manage the DataBase"""
 
     def __init__(self, file: str) -> None:
+        new: bool = False
         if not os.path.exists(file):
+            new = True
             open(file, "a", encoding="utf_8").close()
         self.con = sqlite3.connect(file)
+        if new:
+            cur: sqlite3.Cursor = self.con.cursor()
+            cur.execute("CREATE TABLE entries(name TEXT PRIMARY KEY, password TEXT)")
 
     def __enter__(self) -> "DataBase":
         return self
@@ -54,4 +59,7 @@ class DataBase:
         Returns:
             out (list[tuple[str, str]]): a list of pairs [name, password]
         """
-        raise NotImplementedError
+        statement: str = "SELECT name, password FROM entries"
+        cur: sqlite3.Cursor = self.con.cursor()
+        res: sqlite3.Cursor = cur.execute(statement)
+        return res.fetchall()
