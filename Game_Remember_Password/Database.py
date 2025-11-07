@@ -13,11 +13,10 @@ class DataBase:
         if not os.path.exists(file):
             open(file, "a", encoding="utf_8").close()
         self.con = sqlite3.connect(file)
-        cur: sqlite3.Cursor = self.con.cursor()
-        cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        if ("entries",) not in cur.fetchall():
-            cur.execute("CREATE TABLE entries(name TEXT PRIMARY KEY, password TEXT)")
-            print("Table created")
+        self.cur: sqlite3.Cursor = self.con.cursor()
+        self.cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        if ("entries",) not in self.cur.fetchall():
+            self.cur.execute("CREATE TABLE entries(name TEXT PRIMARY KEY, password TEXT)")
 
     def __enter__(self) -> "DataBase":
         return self
@@ -38,7 +37,10 @@ class DataBase:
         Returns:
             None
         """
-        raise NotImplementedError
+        if self.con.execute(f"SELECT COUNT(1) FROM entries WHERE name='{name}'").fetchone()[0]:
+            return
+        statement: str = f"INSERT INTO entries (name, password) VALUES ('{name}', '{password}')"
+        self.cur.execute(statement)
 
     def deleteEntry(self, name: str) -> None:
         """
@@ -50,7 +52,8 @@ class DataBase:
         Returns:
             None
         """
-        raise NotImplementedError
+        statement: str = f"DELETE FROM entries WHERE name='{name}'"
+        self.cur.execute(statement)
 
     def getEntries(self) -> list[tuple[str, str]]:
         """
@@ -60,6 +63,5 @@ class DataBase:
             out (list[tuple[str, str]]): a list of pairs [name, password]
         """
         statement: str = "SELECT name, password FROM entries"
-        cur: sqlite3.Cursor = self.con.cursor()
-        res: sqlite3.Cursor = cur.execute(statement)
+        res: sqlite3.Cursor = self.cur.execute(statement)
         return res.fetchall()
