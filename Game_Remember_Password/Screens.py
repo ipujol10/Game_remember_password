@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import Event
 from typing import TYPE_CHECKING, Any
 from abc import ABC, abstractmethod
+from Game_Remember_Password.Database import DataBase
 from Game_Remember_Password.Utils import Screens
 from Game_Remember_Password.Widgets import Entry
 
@@ -31,6 +32,10 @@ class MyScreen(tk.Frame, ABC):
     @abstractmethod
     def _key(self, event: Event) -> None:
         """Set the key bindings"""
+
+    @abstractmethod
+    def endProgram(self) -> None:
+        """Execute when ending the program"""
 
 
 class InitialScreen(MyScreen):
@@ -71,6 +76,9 @@ class InitialScreen(MyScreen):
                 return
             case _:
                 pass
+
+    def endProgram(self) -> None:
+        pass
 
 
 class GameScreen(MyScreen):
@@ -166,6 +174,9 @@ class GameScreen(MyScreen):
             case _:
                 pass
 
+    def endProgram(self) -> None:
+        pass
+
 
 class AllPasswords(MyScreen):
     """Screen to have saved passwords and be able to train on them"""
@@ -199,6 +210,9 @@ class AllPasswords(MyScreen):
         self._scrollbar.pack(side="right", fill="y")
         self._inner_frame.pack(fill="both")
 
+        self._db: DataBase = DataBase("Game_Remember_Password/data/entries.db")
+        self._initialPopulation()
+
     def setScreen(self) -> None:
         pass
 
@@ -215,6 +229,7 @@ class AllPasswords(MyScreen):
 
     def addEntry(self, name: str, password: str) -> None:
         """Add a password entry"""
+        self._db.createEntry(name, password)
         Entry(self._inner_frame, self.controller, self, name, password).pack(pady=1)
 
     def _popout(self) -> Any:
@@ -222,7 +237,16 @@ class AllPasswords(MyScreen):
 
     def deleteEntry(self, entry: Entry) -> None:
         """Delete the selected item"""
+        self._db.deleteEntry(entry.getName())
         entry.destroy()
+
+    def _initialPopulation(self) -> None:
+        entries: list[tuple[str, str]] = self._db.getEntries()
+        for name, password in entries:
+            self.addEntry(name, password)
+
+    def endProgram(self) -> None:
+        self._db.end()
 
 
 class AddEntry(tk.Toplevel):

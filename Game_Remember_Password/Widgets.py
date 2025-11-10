@@ -57,3 +57,7 @@ class Entry(tk.Frame):
 
     def _delete(self) -> None:
         self._parent.deleteEntry(self)
+
+    def getName(self) -> str:
+        """Return the name of the entry"""
+        return self._name

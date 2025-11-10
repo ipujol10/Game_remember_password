@@ -40,4 +40,6 @@ class Game(tk.Tk):
     def __exit__(
         self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
     ) -> None:
+        for screen in self._frames.values():
+            screen.endProgram()
         self.quit()
