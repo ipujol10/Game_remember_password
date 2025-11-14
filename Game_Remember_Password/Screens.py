@@ -2,9 +2,11 @@
 
 import tkinter as tk
 from tkinter import Event
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from abc import ABC, abstractmethod
+from Game_Remember_Password.Database import DataBase
 from Game_Remember_Password.Utils import Screens
+from Game_Remember_Password.Widgets import Entry
 
 
 if TYPE_CHECKING:
@@ -31,6 +33,10 @@ class MyScreen(tk.Frame, ABC):
     def _key(self, event: Event) -> None:
         """Set the key bindings"""
 
+    @abstractmethod
+    def endProgram(self) -> None:
+        """Execute when ending the program"""
+
 
 class InitialScreen(MyScreen):
     """The initial screen where you will include in the game"""
@@ -39,20 +45,20 @@ class InitialScreen(MyScreen):
         MyScreen.__init__(self, parent, controller)
         self._password: str = ""
 
-        tk.Label(self, text="Enter the password to train").grid(column=0, row=0, pady=20, sticky="nwe")
+        tk.Label(self, text="Enter the password to train").pack(pady=20)
         self._password_entry: tk.Entry = tk.Entry(self, width=40, show="*")
-        self._password_entry.grid(column=0, row=1, pady=20)
-        tk.Button(self, text="Train", command=self._trainCallback).grid(column=0, row=2, pady=20)
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
+        self._password_entry.pack(pady=20)
+        tk.Button(self, text="Train", command=self._trainCallback).pack(pady=20)
+        tk.Button(self, text="Saved", command=self._toTrain).pack(pady=0)
+        tk.Button(self, text="Exit", command=self.quit).pack(pady=20)
 
     def _trainCallback(self) -> None:
         self._password = self._password_entry.get()
         self.controller.password = self._password
         self.controller.showScreen(Screens.GAME)
+
+    def _toTrain(self) -> None:
+        self.controller.showScreen(Screens.ALL_PASSWORDS)
 
     def setScreen(self) -> None:
         self._password_entry.delete(0, tk.END)
@@ -70,6 +76,9 @@ class InitialScreen(MyScreen):
                 return
             case _:
                 pass
+
+    def endProgram(self) -> None:
+        pass
 
 
 class GameScreen(MyScreen):
@@ -164,3 +173,140 @@ class GameScreen(MyScreen):
                 return
             case _:
                 pass
+
+    def endProgram(self) -> None:
+        pass
+
+
+class AllPasswords(MyScreen):
+    """Screen to have saved passwords and be able to train on them"""
+
+    def __init__(self, parent: tk.Frame, controller: "Game") -> None:
+        MyScreen.__init__(self, parent, controller)
+
+        self._canvas: tk.Canvas = tk.Canvas(self)
+        self._scrollbar: tk.Scrollbar = tk.Scrollbar(
+            self,
+            orient="vertical",
+            command=self._canvas.yview,  # type:ignore
+        )
+
+        self._inner_frame: tk.Frame = tk.Frame(self._canvas, width=controller.winfo_width())
+
+        self._inner_frame.bind(
+            "<Configure>",
+            lambda _: self._canvas.configure(scrollregion=self._canvas.bbox("all")),
+        )
+        self._canvas.bind("<MouseWheel>", self._onMousewheel)
+
+        self._canvas.create_window((0, 0), window=self._inner_frame, anchor="nw")
+        self._canvas.configure(yscrollcommand=self._scrollbar.set)
+
+        tk.Button(self, text="Add", command=self._popout).pack(side="top", fill="y")
+
+        self._entries: set[Entry] = set()
+
+        self._canvas.pack(side="left", fill="both", expand=True)
+        self._scrollbar.pack(side="right", fill="y")
+        self._inner_frame.pack(fill="both")
+
+        self._db: DataBase = DataBase("Game_Remember_Password/data/entries.db")
+        self._initialPopulation()
+
+    def setScreen(self) -> None:
+        pass
+
+    def _key(self, event: Event) -> None:
+        key: str = event.keysym
+        match key:
+            case "Escape":
+                self.controller.showScreen(Screens.INITIAL)
+            case _:
+                pass
+
+    def _onMousewheel(self, event: Event) -> None:
+        self._canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def addEntry(self, name: str, password: str) -> None:
+        """Add a password entry"""
+        self._db.createEntry(name, password)
+        Entry(self._inner_frame, self.controller, self, name, password).pack(pady=1)
+
+    def _popout(self) -> Any:
+        AddEntry.getInstance(self.controller, self)
+
+    def deleteEntry(self, entry: Entry) -> None:
+        """Delete the selected item"""
+        self._db.deleteEntry(entry.getName())
+        entry.destroy()
+
+    def _initialPopulation(self) -> None:
+        entries: list[tuple[str, str]] = self._db.getEntries()
+        for name, password in entries:
+            self.addEntry(name, password)
+
+    def endProgram(self) -> None:
+        self._db.end()
+
+
+class AddEntry(tk.Toplevel):
+    """Create a new window to create a new Password entry"""
+
+    _instance = None
+
+    def __init__(self, master: "Game", parent_screen: AllPasswords) -> None:
+        if AddEntry._instance is not None:
+            raise ValueError("Already Exists!")
+        tk.Toplevel.__init__(self, master=master)
+
+        self._parent = parent_screen
+
+        tk.Label(self, text="Input Name:").grid(column=0, row=0)
+        self._name: tk.Entry = tk.Entry(self)
+        self._name.grid(column=1, row=0)
+        tk.Label(self, text="Password:").grid(column=0, row=1)
+        self._password: tk.Entry = tk.Entry(self)
+        self._password.grid(column=1, row=1)
+        tk.Button(self, text="Save", command=self._sendEntry).grid(column=0, row=2, columnspan=2)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+
+        self.protocol("WM_DELETE_WINDOW", self._onClose)
+        self.bind("<KeyPress>", self._key)
+        self._name.focus()
+
+    @staticmethod
+    def getInstance(master: "Game", parent_screen: AllPasswords) -> "AddEntry":
+        """Get the AddEntry instance if it exists or create it if not"""
+        if AddEntry._instance is None:
+            AddEntry._instance = AddEntry(master, parent_screen)
+        AddEntry._instance.focusEntry()
+        return AddEntry._instance
+
+    def _sendEntry(self) -> None:
+        name: str = self._name.get()
+        password: str = self._password.get()
+        self._parent.addEntry(name, password)
+        self._onClose()
+
+    def _onClose(self) -> None:
+        AddEntry._instance = None
+        self.unbind("<KeyPress>")
+        self.destroy()
+
+    def _key(self, event: Event) -> None:
+        key: str = event.keysym
+        match key:
+            case "Return":
+                if self._name.get() and self._password.get():
+                    self._sendEntry()
+            case _:
+                pass
+
+    def focusEntry(self) -> None:
+        """Focus on the name entry Entry"""
+        self._name.focus()
