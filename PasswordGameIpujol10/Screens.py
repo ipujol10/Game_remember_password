@@ -4,10 +4,9 @@ import tkinter as tk
 from tkinter import Event
 from typing import TYPE_CHECKING, Any
 from abc import ABC, abstractmethod
-from Game_Remember_Password.Database import DataBase
-from Game_Remember_Password.Utils import Screens
-from Game_Remember_Password.Widgets import Entry
-
+from PasswordGameIpujol10.Database import DataBase
+from PasswordGameIpujol10.Utils import Screens
+from PasswordGameIpujol10.Widgets import Entry
 
 if TYPE_CHECKING:
     from Game import Game
@@ -188,7 +187,7 @@ class AllPasswords(MyScreen):
         self._scrollbar: tk.Scrollbar = tk.Scrollbar(
             self,
             orient="vertical",
-            command=self._canvas.yview,  # type:ignore
+            command=self._canvas.yview,  # type: ignore
         )
 
         self._inner_frame: tk.Frame = tk.Frame(self._canvas, width=controller.winfo_width())
@@ -210,7 +209,7 @@ class AllPasswords(MyScreen):
         self._scrollbar.pack(side="right", fill="y")
         self._inner_frame.pack(fill="both")
 
-        self._db: DataBase = DataBase("Game_Remember_Password/data/entries.db")
+        self._db: DataBase = DataBase("PasswordGameIpujol10/data/entries.db")
         self._initialPopulation()
 
     def setScreen(self) -> None:

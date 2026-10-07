@@ -3,7 +3,7 @@
 import os
 import unittest
 
-from Game_Remember_Password.Database import DataBase
+from PasswordGameIpujol10.Database import DataBase
 
 
 class DataBaseTest(unittest.TestCase):
