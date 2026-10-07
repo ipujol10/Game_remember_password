@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import Event
 from typing import TYPE_CHECKING
-from Game_Remember_Password.Screens import Screens
+from PasswordGameIpujol10.Screens import Screens
 
 if TYPE_CHECKING:
     from Game import Game

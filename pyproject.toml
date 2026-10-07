@@ -1,0 +1,17 @@
+[project]
+name = "PasswordGameIpujol10"
+version = "0.0.1"
+authors = [{ name = "Iñaki Pujol", email = "ipujol10@gmail.com" }]
+description = "A small program to visualize sorting algorithms"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = ["Programming Language :: Python :: 3"]
+license = "MIT"
+license-files = ["LICENCE"]
+dependencies = []
+
+[tool.setuptools]
+package-dir = { "" = "." }
+
+[tool.setuptools.packages.find]
+where = ["."]
