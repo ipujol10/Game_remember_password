@@ -1,0 +1,1 @@
+python -m PyInstaller --name PasswordGame --windowed --onedir --add-data "PasswordGameIpujol10\data\*:PasswordGameIpujol10\data\" --noconfirm --clean .\PasswordGame.py

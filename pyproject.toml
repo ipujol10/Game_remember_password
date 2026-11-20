@@ -1,6 +1,6 @@
 [project]
 name = "PasswordGameIpujol10"
-version = "0.0.1"
+version = "1.0"
 authors = [{ name = "Iñaki Pujol", email = "ipujol10@gmail.com" }]
 description = "A small program to visualize sorting algorithms"
 readme = "README.md"
